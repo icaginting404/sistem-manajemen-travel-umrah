@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type PaketUmrah = {
   id: number;
@@ -24,7 +24,7 @@ type BiayaOperasional = {
   nominal: number;
 };
 
-export default function BiayaOperasionalPetugasPage() {
+function BiayaOperasionalPetugasPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -34,19 +34,19 @@ export default function BiayaOperasionalPetugasPage() {
       : null;
 
   const [selectedPaket, setSelectedPaket] = useState(
-    searchParams.get("paketId") || ""
+    searchParams.get("paketId") || "",
   );
 
   const [paketUmrah, setPaketUmrah] = useState<PaketUmrah[]>([]);
-  const [biayaOperasional, setBiayaOperasional] = useState<
-    BiayaOperasional[]
-  >([]);
+  const [biayaOperasional, setBiayaOperasional] = useState<BiayaOperasional[]>(
+    [],
+  );
 
   useEffect(() => {
     const getPaket = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/paket-umrah`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/paket-umrah`,
         );
 
         const data = await response.json();
@@ -66,7 +66,7 @@ export default function BiayaOperasionalPetugasPage() {
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/biaya-operasional/petugas?petugas_id=${user.id}&paket_id=${selectedPaket}`
+          `${process.env.NEXT_PUBLIC_API_URL}/biaya-operasional/petugas?petugas_id=${user.id}&paket_id=${selectedPaket}`,
         );
 
         const data = await response.json();
@@ -114,9 +114,7 @@ export default function BiayaOperasionalPetugasPage() {
       radius="oval"
       variant="contained"
       onClick={() =>
-        router.push(
-          `/petugas/biaya-operasional/detail/${item.id}`
-        )
+        router.push(`/petugas/biaya-operasional/detail/${item.id}`)
       }
     />,
   ]);
@@ -124,9 +122,7 @@ export default function BiayaOperasionalPetugasPage() {
   return (
     <section className="p-8 bg-sab-bg-gray min-h-screen">
       <div className="flex justify-between items-center mb-5">
-        <h1 className="text-2xl font-bold">
-          Biaya Operasional
-        </h1>
+        <h1 className="text-2xl font-bold">Biaya Operasional</h1>
 
         <div className="flex gap-3 items-center">
           <FormControl size="small">
@@ -138,12 +134,10 @@ export default function BiayaOperasionalPetugasPage() {
                 if (!selected) return "Pilih Paket Umrah";
 
                 const paket = paketUmrah.find(
-                  (item) => String(item.id) === selected
+                  (item) => String(item.id) === selected,
                 );
 
-                return (
-                  paket?.nama_paket ?? "Pilih Paket Umrah"
-                );
+                return paket?.nama_paket ?? "Pilih Paket Umrah";
               }}
               sx={{
                 minWidth: 300,
@@ -161,10 +155,7 @@ export default function BiayaOperasionalPetugasPage() {
               }}
             >
               {paketUmrah.map((paket) => (
-                <MenuItem
-                  key={paket.id}
-                  value={String(paket.id)}
-                >
+                <MenuItem key={paket.id} value={String(paket.id)}>
                   {paket.nama_paket}
                 </MenuItem>
               ))}
@@ -178,7 +169,7 @@ export default function BiayaOperasionalPetugasPage() {
               variant="contained"
               onClick={() =>
                 router.push(
-                  `/petugas/biaya-operasional/add?paketId=${selectedPaket}`
+                  `/petugas/biaya-operasional/add?paketId=${selectedPaket}`,
                 )
               }
             />
@@ -193,21 +184,23 @@ export default function BiayaOperasionalPetugasPage() {
           </h2>
 
           <p className="mt-2 text-gray-500">
-            Silakan pilih paket umrah terlebih dahulu
-            untuk melihat biaya operasional.
+            Silakan pilih paket umrah terlebih dahulu untuk melihat biaya
+            operasional.
           </p>
         </div>
       ) : (
         <Table
-          headers={[
-            "Tanggal",
-            "Keterangan",
-            "Nominal",
-            "Aksi",
-          ]}
+          headers={["Tanggal", "Keterangan", "Nominal", "Aksi"]}
           data={tableData}
         />
       )}
     </section>
+  );
+}
+export default function BiayaOperasionalPetugas() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BiayaOperasionalPetugasPageContent />
+    </Suspense>
   );
 }

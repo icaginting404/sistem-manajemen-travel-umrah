@@ -4,9 +4,9 @@ import DateInput from "@/src/components/atoms/date-input.component";
 import Modal from "@/src/components/atoms/modal.component";
 import Input from "@/src/components/atoms/text-input.component";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
-const TambahKegiatanPage = () => {
+function TambahKegiatanPageContent() {
   const route = useRouter();
   const searchParams = useSearchParams();
   const paketId = searchParams.get("paketId");
@@ -54,13 +54,16 @@ const TambahKegiatanPage = () => {
         ],
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kegiatan`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/kegiatan`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       const result = await response.json();
 
@@ -160,6 +163,12 @@ const TambahKegiatanPage = () => {
       </Modal>
     </section>
   );
-};
+}
 
-export default TambahKegiatanPage;
+export default function TambahKegiatanPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TambahKegiatanPageContent />
+    </Suspense>
+  );
+}

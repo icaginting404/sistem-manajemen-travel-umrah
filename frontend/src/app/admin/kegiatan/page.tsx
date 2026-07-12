@@ -13,7 +13,7 @@ import {
 import { Calendar, Circle, Edit, MapPin, Plus, Trash2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type PaketUmrah = {
   id: number;
@@ -49,7 +49,7 @@ const getStatus = (tanggal: string) => {
   return "Sedang Berlangsung";
 };
 
-const HalamanKegiatan = () => {
+function HalamanKegiatanContent() {
   const route = useRouter();
   const searchParams = useSearchParams();
   const paketIdFromUrl = searchParams.get("paketId") ?? "";
@@ -88,7 +88,9 @@ const HalamanKegiatan = () => {
   useEffect(() => {
     const getPaketUmrah = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/paket-umrah`);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/paket-umrah`,
+        );
 
         const data = await response.json();
         console.log(data);
@@ -127,9 +129,12 @@ const HalamanKegiatan = () => {
     if (!confirmDelete) return;
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/kegiatan/detail/${detailId}`, {
-        method: "DELETE",
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/kegiatan/detail/${detailId}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       // Refresh data
       const response = await fetch(
@@ -334,6 +339,12 @@ const HalamanKegiatan = () => {
       )}
     </section>
   );
-};
+}
 
-export default HalamanKegiatan;
+export default function HalamanKegiatan() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HalamanKegiatanContent />
+    </Suspense>
+  );
+}

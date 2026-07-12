@@ -6,9 +6,8 @@ import Modal from "@/src/components/atoms/modal.component";
 import Input from "@/src/components/atoms/text-input.component";
 import { useToast } from "@/src/context/toast.context";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-
-const TambahBiayaOperasionalPage = () => {
+import { useEffect, useState, Suspense } from "react";
+function TambahBiayaOperasionalContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -177,6 +176,12 @@ const TambahBiayaOperasionalPage = () => {
       </Modal>
     </section>
   );
-};
+}
 
-export default TambahBiayaOperasionalPage;
+export default function TambahBiayaOperasionalPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TambahBiayaOperasionalContent />
+    </Suspense>
+  );
+}

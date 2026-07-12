@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { ChevronDown, Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 type PaketUmrah = {
   id: number;
@@ -26,7 +26,7 @@ type BiayaOperasional = {
   petugas_id: number | null;
 };
 
-const BiayaOperasionalPage = () => {
+function BiayaOperasionalPageContent() {
   const [paketUmrah, setPaketUmrah] = useState<PaketUmrah[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,8 +37,6 @@ const BiayaOperasionalPage = () => {
   const [biayaOperasional, setBiayaOperasional] = useState<BiayaOperasional[]>(
     [],
   );
-
-  
 
   useEffect(() => {
     const getPaket = async () => {
@@ -187,6 +185,12 @@ const BiayaOperasionalPage = () => {
       )}
     </section>
   );
-};
+}
 
-export default BiayaOperasionalPage;
+export default function BiayaOperasionalPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BiayaOperasionalPageContent />
+    </Suspense>
+  );
+}

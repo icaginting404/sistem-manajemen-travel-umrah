@@ -50,22 +50,19 @@ const Input = ({
       {variant !== "auth" && label && (
         <label className="block text-sab-gray-500 font-medium pb-2">
           {label}
-          {props.required && (
-            <span className="text-red-500 ml-1">*</span>
-          )}
+          {props.required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
 
       <input
         className={`
-          ${baseStyle}
-          ${variants[variant]}
-          ${className}
-        `}
+    ${baseStyle}
+    ${variants[variant]}
+    ${className}
+  `}
         onChange={handleChange}
-        value={value}
         {...props}
-        {...(props.type !== "file" ? { value: value || inputValue } : {})}
+        {...(props.type !== "file" ? { value: value ?? inputValue } : {})}
       />
     </div>
   );

@@ -5,10 +5,10 @@ import DateInput from "@/src/components/atoms/date-input.component";
 import Modal from "@/src/components/atoms/modal.component";
 import Input from "@/src/components/atoms/text-input.component";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useToast } from "@/src/context/toast.context";
 
-const TambahBiayaOperasionalPetugasPage = () => {
+function TambahBiayaOperasionalPetugasPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -181,6 +181,12 @@ const TambahBiayaOperasionalPetugasPage = () => {
       </Modal>
     </section>
   );
-};
+}
 
-export default TambahBiayaOperasionalPetugasPage;
+export default function TambahBiayaOperasionalPetugasPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TambahBiayaOperasionalPetugasPageContent />
+    </Suspense>
+  );
+}
