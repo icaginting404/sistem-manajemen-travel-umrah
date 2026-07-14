@@ -1,27 +1,33 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+transporter.verify((err) => {
+  if (err) {
+    console.log("SMTP Error:", err);
+  } else {
+    console.log("SMTP Ready");
+  }
+});
 
 export const sendEmail = async ({ to, subject, html }) => {
-  try {
-    const { data, error } = await resend.emails.send({
-      from: "PT Syifa Amanah Baitullah <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
-    });
+  console.log("Mengirim email ke:", to);
 
-    if (error) {
-      console.error("❌ Gagal mengirim email:", error);
-      throw error;
-    }
+  const info = await transporter.sendMail({
+    from: `"PT Syifa Amanah Baitullah" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    html,
+  });
 
-    console.log("✅ Email berhasil dikirim:", data?.id);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  console.log("Email berhasil:", info.messageId);
 };
