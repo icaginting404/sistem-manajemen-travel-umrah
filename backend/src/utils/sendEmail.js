@@ -4,16 +4,24 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Paksa Node menggunakan IPv4
+// Paksa IPv4
 dns.setDefaultResultOrder("ipv4first");
+
+// Cek DNS yang dipakai
+dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
+  console.log("SMTP DNS:", addresses);
+});
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
   requireTLS: true,
-
   family: 4,
+
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 
   auth: {
     user: process.env.EMAIL_USER,
@@ -22,14 +30,23 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendEmail = async ({ to, subject, html }) => {
-  console.log("Mengirim email ke:", to);
+  try {
+    console.log("=================================");
+    console.log("Mulai kirim email...");
+    console.log("Tujuan :", to);
 
-  const info = await transporter.sendMail({
-    from: `"PT Syifa Amanah Baitullah" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    html,
-  });
+    const info = await transporter.sendMail({
+      from: `"PT Syifa Amanah Baitullah" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+    });
 
-  console.log("Email berhasil:", info.messageId);
+    console.log("✅ BERHASIL");
+    console.log(info);
+  } catch (err) {
+    console.error("❌ GAGAL");
+    console.error(err);
+    throw err;
+  }
 };
