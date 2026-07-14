@@ -1,4 +1,6 @@
 import db from "../config/db.js";
+import { sendEmail } from "../utils/sendEmail.js";
+import { kirimNotifikasiKegiatan } from "../utils/notification.js";
 
 export const createKegiatan = (req, res) => {
   const { paket_id, tanggal, kegiatan } = req.body;
@@ -36,11 +38,16 @@ export const createKegiatan = (req, res) => {
         VALUES ?
       `;
 
-      db.query(detailQuery, [values], (detailErr) => {
+      db.query(detailQuery, [values], async (detailErr) => {
         if (detailErr) {
           return res.status(500).json({
             message: detailErr.message,
           });
+        }
+        try {
+          await kirimNotifikasiKegiatan(paket_id, tanggal, kegiatan);
+        } catch (error) {
+          console.error("Gagal mengirim notifikasi:", error);
         }
 
         return res.status(200).json({
@@ -521,4 +528,29 @@ export const getGaleriById = (req, res) => {
       })),
     });
   });
+};
+
+export const testEmail = async (req, res) => {
+  try {
+    await sendEmail({
+      to: "tugasakhir064@gmail.com",
+      subject: "Tes Notifikasi Sistem Manajemen Travel Umrah",
+      html: `
+    <h2>Halo 👋</h2>
+    <p>Jika email ini masuk, berarti konfigurasi Nodemailer berhasil.</p>
+  `,
+    });
+
+    res.json({
+      success: true,
+      message: "Email berhasil dikirim",
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };

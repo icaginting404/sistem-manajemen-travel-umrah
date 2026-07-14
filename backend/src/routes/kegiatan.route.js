@@ -12,6 +12,7 @@ import {
   uploadDokumentasi as uploadDoukumentasiController,
   getGaleri,
   getGaleriById,
+  testEmail,
 } from "../controllers/kegiatan.controller.js";
 import { uploadDokumentasi } from "../middlewares/uploadDokumentasi.js";
 
@@ -20,6 +21,7 @@ const kegiatanRoute = express.Router();
 kegiatanRoute.post("/", createKegiatan);
 kegiatanRoute.get("/", getKegiatan);
 kegiatanRoute.get("/galeri", getGaleri);
+kegiatanRoute.get("/test-email", testEmail);
 kegiatanRoute.get("/detail/:id", getDetailKegiatanById);
 kegiatanRoute.put("/detail/:id", updateDetailKegiatan);
 kegiatanRoute.delete("/detail/:id", deleteDetailKegiatan);
