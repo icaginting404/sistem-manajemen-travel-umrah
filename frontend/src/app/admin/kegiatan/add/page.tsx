@@ -15,9 +15,12 @@ function TambahKegiatanPageContent() {
 
   const [formData, setFormData] = useState({
     tanggal: "",
-    status: "",
-    nama: "",
-    lokasi: "",
+    kegiatan: [
+      {
+        nama: "",
+        lokasi: "",
+      },
+    ],
   });
 
   useEffect(() => {
@@ -40,20 +43,53 @@ function TambahKegiatanPageContent() {
     getPaket();
   }, [paketId]);
 
+  const tambahFormKegiatan = () => {
+    setFormData({
+      ...formData,
+      kegiatan: [
+        ...formData.kegiatan,
+        {
+          nama: "",
+          lokasi: "",
+        },
+      ],
+    });
+  };
+
+  const hapusFormKegiatan = (index: number) => {
+    if (formData.kegiatan.length === 1) return;
+
+    const data = [...formData.kegiatan];
+    data.splice(index, 1);
+
+    setFormData({
+      ...formData,
+      kegiatan: data,
+    });
+  };
+
+  const updateKegiatan = (
+    index: number,
+    field: "nama" | "lokasi",
+    value: string,
+  ) => {
+    const data = [...formData.kegiatan];
+
+    data[index][field] = value;
+
+    setFormData({
+      ...formData,
+      kegiatan: data,
+    });
+  };
+
   const tambahKegiatan = async () => {
     try {
       const payload = {
         paket_id: Number(paketId),
         tanggal: formData.tanggal,
-        status: "Belum Dimulai",
-        kegiatan: [
-          {
-            nama: formData.nama,
-            lokasi: formData.lokasi,
-          },
-        ],
+        kegiatan: formData.kegiatan,
       };
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/kegiatan`,
         {
@@ -104,46 +140,59 @@ function TambahKegiatanPageContent() {
             }
           />
 
-          {/* STATUS */}
-          {/* <Input
-            label="Status Agenda"
-            variant="primary"
-            placeholder="Belum Dimulai / Sedang Berlangsung / Selesai"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                status: e.target.value,
-              })
-            }
-          /> */}
+          <div className="flex flex-col gap-6">
+            {formData.kegiatan.map((item, index) => (
+              <div key={index} className="border border-primary rounded-xl p-4 bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-semibold text-secondary">
+                    Kegiatan {index + 1}
+                  </h2>
 
-          {/* NAMA */}
-          <Input
-            label="Nama Kegiatan"
-            variant="primary"
-            placeholder="Masukkan kegiatan"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                nama: e.target.value,
-              })
-            }
-          />
+                  {formData.kegiatan.length > 1 && (
+                    <button
+                      type="button"
+                      className="text-red-500 text-sm hover:underline"
+                      onClick={() => hapusFormKegiatan(index)}
+                    >
+                      Hapus
+                    </button>
+                  )}
+                </div>
 
-          {/* LOKASI */}
-          <Input
-            label="Lokasi"
-            variant="primary"
-            placeholder="Masukkan lokasi"
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                lokasi: e.target.value,
-              })
-            }
-          />
+                <Input
+                  label="Nama Kegiatan"
+                  variant="primary"
+                  value={item.nama}
+                  placeholder="Masukkan kegiatan"
+                  onChange={(e) =>
+                    updateKegiatan(index, "nama", e.target.value)
+                  }
+                />
+
+                <div className="mt-3">
+                  <Input
+                    label="Lokasi"
+                    variant="primary"
+                    value={item.lokasi}
+                    placeholder="Masukkan lokasi"
+                    onChange={(e) =>
+                      updateKegiatan(index, "lokasi", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
+        <div className="flex justify-center mt-5">
+          <Button
+            color="primary"
+            variant="outline"
+            label="+ Tambah Kegiatan"
+            onClick={tambahFormKegiatan}
+          />
+        </div>
         {/* BUTTON */}
         <div className="flex gap-2 justify-end mt-10">
           <Button
