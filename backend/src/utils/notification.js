@@ -10,6 +10,9 @@ const formatTanggal = (tanggal) => {
 };
 
 export const kirimNotifikasiKegiatan = (paketId, tanggal, kegiatan) => {
+  console.log("===== NOTIFIKASI DIMULAI =====");
+  console.log("paketId:", paketId);
+  console.log("tanggal:", tanggal);
   const query = `
     SELECT DISTINCT
       u.nama,
@@ -27,7 +30,8 @@ export const kirimNotifikasiKegiatan = (paketId, tanggal, kegiatan) => {
       console.error("Gagal mengambil data jamaah:", err);
       return;
     }
-
+    console.log("Jumlah jamaah ditemukan:", results.length);
+    console.log("Data jamaah:", results);
     if (results.length === 0) {
       console.log("Tidak ada jamaah yang menerima notifikasi.");
       return;
@@ -35,8 +39,8 @@ export const kirimNotifikasiKegiatan = (paketId, tanggal, kegiatan) => {
 
     for (const jamaah of results) {
       const tanggalFormat = formatTanggal(tanggal);
-      console.log("Mengirim email ke:", jamaah.email);
 
+      console.log("Akan kirim email ke:", jamaah.email);
       try {
         await sendEmail({
           to: jamaah.email,
