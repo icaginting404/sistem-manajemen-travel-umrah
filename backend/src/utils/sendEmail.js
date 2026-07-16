@@ -23,18 +23,17 @@ const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT),
   secure: process.env.EMAIL_SECURE === "true",
-  requireTLS: true,
-  family: 4,
-
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
 
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
+
+await transporter
+  .verify()
+  .then(() => console.log("SMTP CONNECTED"))
+  .catch((err) => console.error("SMTP ERROR:", err));
 
 export const sendEmail = async ({ to, subject, html }) => {
   try {
