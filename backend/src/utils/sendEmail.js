@@ -1,22 +1,14 @@
 import nodemailer from "nodemailer";
-import dns from "dns";
 import dotenv from "dotenv";
 
 dotenv.config();
-
-// Paksa IPv4
-dns.setDefaultResultOrder("ipv4first");
-
-// Cek DNS yang dipakai
-dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
-  console.log("SMTP DNS:", addresses);
-});
 
 console.log("=== SMTP CONFIG ===");
 console.log("HOST:", process.env.EMAIL_HOST);
 console.log("PORT:", process.env.EMAIL_PORT);
 console.log("SECURE:", process.env.EMAIL_SECURE);
 console.log("USER:", process.env.EMAIL_USER);
+console.log("PASS EXISTS:", process.env.EMAIL_PASS ? "YES" : "NO");
 console.log("===================");
 
 const transporter = nodemailer.createTransport({
@@ -28,18 +20,17 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-});
 
-await transporter
-  .verify()
-  .then(() => console.log("SMTP CONNECTED"))
-  .catch((err) => console.error("SMTP ERROR:", err));
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
+});
 
 export const sendEmail = async ({ to, subject, html }) => {
   try {
     console.log("=================================");
     console.log("Mulai kirim email...");
-    console.log("Tujuan :", to);
+    console.log("Tujuan:", to);
 
     const info = await transporter.sendMail({
       from: `"PT Syifa Amanah Baitullah" <${process.env.EMAIL_USER}>`,
@@ -48,11 +39,14 @@ export const sendEmail = async ({ to, subject, html }) => {
       html,
     });
 
-    console.log("✅ BERHASIL");
-    console.log(info);
+    console.log("✅ EMAIL BERHASIL DIKIRIM");
+    console.log("Message ID:", info.messageId);
+
+    return info;
   } catch (err) {
-    console.error("❌ GAGAL");
+    console.error("❌ EMAIL GAGAL DIKIRIM");
     console.error(err);
+
     throw err;
   }
 };
