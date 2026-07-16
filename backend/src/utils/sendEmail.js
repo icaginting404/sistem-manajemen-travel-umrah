@@ -12,6 +12,13 @@ dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
   console.log("SMTP DNS:", addresses);
 });
 
+console.log("=== SMTP CONFIG ===");
+console.log("HOST:", process.env.EMAIL_HOST);
+console.log("PORT:", process.env.EMAIL_PORT);
+console.log("SECURE:", process.env.EMAIL_SECURE);
+console.log("USER:", process.env.EMAIL_USER);
+console.log("===================");
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT),
